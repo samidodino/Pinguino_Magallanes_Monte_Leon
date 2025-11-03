@@ -179,6 +179,9 @@ datos_early_chick <- datos_early_chick %>%
 head(datos_early_chick)
 
 ################### Datos SAM desde la URL ##################
+# Para SAM usamos más meses porque es un índice climático global/regional con alta variabilidad mensual. 
+# Para SST, SSTA y Chla (medidas locales) basta con ventanas más cortas que reflejan las condiciones críticas del hábitat. 
+# Promediar más meses para SAM reduce el “ruido” y permite compararlo con las otras variables sin sesgos por meses extremos.
 
 url <- "https://www.cpc.ncep.noaa.gov/products/precip/CWlink/daily_ao_index/aao/monthly.aao.index.b79.current.ascii"
 sam_data <- read.table(url, header = FALSE)
@@ -232,6 +235,7 @@ datos_completos <- datos_early_chick %>%
 
 
 write.csv(datos_completos, "data_ambiental_PM_monte_leon.csv", row.names = FALSE)
+
 
 
 
