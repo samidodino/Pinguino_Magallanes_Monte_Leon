@@ -16,7 +16,6 @@ library(dplyr)
 library(sf)
 library(tools)
 library(tidyr)
-#library(lubridate)
 library(purrr)
 library(stringr)
 library(readxl)
@@ -239,4 +238,5 @@ datos_completos <- datos_early_chick %>%
 
 
 write.csv(datos_completos, "data_ambiental_PM_monte_leon.csv", row.names = FALSE)
+
 
