@@ -11,14 +11,10 @@
 
 rm(list = ls())
 library(terra)
-library(rstatix)
 library(dplyr)
-library(sf)
-library(tools)
 library(tidyr)
-library(purrr)
 library(stringr)
-library(readxl)
+library(ggplot2)
 
 #### ----- Cuidado de pichones -----###
 #### Agrupamiento de rasters por temporada ####
@@ -183,8 +179,6 @@ datos_early_chick <- datos_early_chick %>%
 head(datos_early_chick)
 
 ################### Datos SAM desde la URL ##################
-library(dplyr)
-library(ggplot2)
 
 url <- "https://www.cpc.ncep.noaa.gov/products/precip/CWlink/daily_ao_index/aao/monthly.aao.index.b79.current.ascii"
 sam_data <- read.table(url, header = FALSE)
@@ -238,5 +232,6 @@ datos_completos <- datos_early_chick %>%
 
 
 write.csv(datos_completos, "data_ambiental_PM_monte_leon.csv", row.names = FALSE)
+
 
 
