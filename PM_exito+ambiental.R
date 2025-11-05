@@ -1,18 +1,17 @@
-##### Penguins Monte Leon ####
+##############----- Pingüinos- Monte Leon -----##############
 rm(list = ls())
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
 
-##############----- Penguins- Monte Leon -----##############
 ##Éxito reproductivo + data ambiental
-
+#Pingüinos
 data_PM <- read.csv("ER 2010-2024.csv")
-
-
+#Variables ambientales
 data_amb <- read.csv("data_ambiental_PM_monte_leon.csv")
 str(data_amb)
 
+#Union de tablas
 data_full <- data_PM %>% 
   inner_join(data_amb, by = c("season"))
 
