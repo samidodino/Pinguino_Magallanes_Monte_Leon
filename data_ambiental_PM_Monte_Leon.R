@@ -19,86 +19,90 @@ library(ggplot2)
 #### ----- Cuidado de pichones -----###
 #### Agrupamiento de rasters por temporada ####
 
-#Directorio con los rasters
-base_dir <- "E:/SSTA"                    
-output_dir <- "E:/SSTA/season_means_PM"     
-dir.create(output_dir, showWarnings = FALSE) 
+#Directorios con los rasters
+data_dirs <- list(
+  SST = "F:/SST_MODIS/",
+  SSTA = "F:/SSTA/",
+  Chla = "F:/Chla/"
+)
 
-# Pingüino Magallames - etapas
+# Etapas del pingüino Magallanes
 seasons <- list(
-  early_chick = c("NOVIEMBRE","DICIEMBRE","ENERO")# usamos solo esta etapa para este analisis pero se pueden sacar todas
+  early_chick = c("NOVIEMBRE","DICIEMBRE","ENERO")# usamos solo esta etapa para este analisis pero se pueden sacar todas cambiando season_name en la funcion
   #pre_molt = c("FEBRERO", "MARZO"),
   #winter = c("ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE"),
   #last_1_month_winter=c("SEPTIEMBRE"),
   #last_2months_winter= c("AGOSTO", "SEPTIEMBRE")
 )
 
-# Función para obtener los archivos de una temporada 
+# ---- Funciones ----
 
-get_season_files <- function(year, season, season_name) {
+# Obtener archivos de una temporada
+get_season_files <- function(base_dir, year, season, season_name, variable_suffix) {
   season_files <- c()
+  
   for (month in season) {
     if (season_name == "early_chick") {
-      # Noviembre y diciembre vienen del año anterior
+      # noviembre/diciembre -> año anterior
       if (month %in% c("NOVIEMBRE", "DICIEMBRE")) {
         folder_year <- year - 1
-      } else if (month == "ENERO") {
-        folder_year <- year  # Enero del año actual
       } else {
         folder_year <- year
       }
     } else {
-      folder_year <- year  # Para otras estaciones
+      folder_year <- year
     }
     
     folder <- file.path(base_dir, as.character(folder_year))
-    month_files <- list.files(folder, pattern = paste0(month, folder_year, "_SSTA\\.nc$"), full.names = TRUE)
+    pattern <- paste0(month, folder_year, "_", variable_suffix, "\\.nc$")
+    month_files <- list.files(folder, pattern = pattern, full.names = TRUE)
     season_files <- c(season_files, month_files)
   }
   
   return(season_files)
 }
 
-
-# Función para calcular la media de rásters
+# Calcular la media de los rásters
 calculate_mean_raster <- function(raster_files) {
-  if (length(raster_files) == 0) {
-    return(NULL)  # Si no hay archivos, devolver NULL
-  }
-  rasters <- rast(raster_files)  
-  mean_raster <- mean(rasters)  
+  if (length(raster_files) == 0) return(NULL)
+  rasters <- rast(raster_files)
+  mean_raster <- mean(rasters)
   return(mean_raster)
 }
 
-# Procesar cada año y temporada
+# ---- Bucle principal ----
 
-for (year in 2010:2024) {
-  for (season_name in names(seasons)) {
-    
-    # Obtener los archivos correspondientes a la temporada
-    season_files <- get_season_files(year, seasons[[season_name]], season_name)
-    
-    # Media de los rásters de la temporada
-    mean_season_raster <- calculate_mean_raster(season_files)
-    
-    # Guardar ráster medio 
-    if (!is.null(mean_season_raster)) {
+for (var_name in names(data_dirs)) {
+  
+  base_dir <- data_dirs[[var_name]]
+  variable_suffix <- var_name  # SST, SSTA, o Chla
+  
+  # Crear carpeta de salida
+  output_dir <- file.path(base_dir, "season_means_PM")
+  dir.create(output_dir, showWarnings = FALSE)
+  
+  cat("\nProcesando variable:", var_name, "\n")
+  
+  for (year in 2010:2024) {
+    for (season_name in names(seasons)) {
       
-      # Etiquetado del archivo de salida según la temporada
-      if (season_name == "early_chick") {
-        # Correcto: año de nov/dic es anterior (year - 1), año de enero es el actual (year)
-        season_label <- paste0("s", substr(year - 1, 3, 4), "-", substr(year, 3, 4))
-      } else {
-        # Otros casos, solo el año
-        season_label <- as.character(year)
+      season_files <- get_season_files(base_dir, year, seasons[[season_name]], season_name, variable_suffix)
+      mean_season_raster <- calculate_mean_raster(season_files)
+      
+      if (!is.null(mean_season_raster)) {
+        if (season_name == "early_chick") {
+          season_label <- paste0("s", substr(year - 1, 3, 4), "-", substr(year, 3, 4))
+        } else {
+          season_label <- as.character(year)
+        }
+        
+        output_file <- file.path(output_dir, paste0(season_label, "_", season_name, "_", variable_suffix, ".tif"))
+        writeRaster(mean_season_raster, output_file, overwrite = TRUE)
       }
-      
-      output_file <- file.path(output_dir, paste0(season_label, "_", season_name, "_SSTA.tif"))
-      
-      writeRaster(mean_season_raster, output_file, overwrite = TRUE)
     }
   }
 }
+
 
 
 ##Extraer datos de SST y Chla haciendo un buffer de 50km desde la colonia
@@ -118,12 +122,11 @@ buffers_50km_geo <- project(buffers_50km, "+proj=longlat +datum=WGS84")
 # Rutas a las carpetas de rásters
 data_dirs <- list(
   PM = list(
-    SST = "E:/SST_MODIS/season_means_PM",
-    SSTA = "E:/SSTA/season_means_PM",
-    Chla = "E:/Chla/season_means_PM"
+    SST = "F:/SST_MODIS/season_means_PM",
+    SSTA = "F:/SSTA/season_means_PM",
+    Chla = "F:/Chla/season_means_PM"
   )
 )
-
 
 
 # Listar archivos ráster de ambas carpetas
