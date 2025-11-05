@@ -111,7 +111,7 @@ tab_model(modelo_no_lineal_3)
 # GRAFICAR Predicciones
 plot(ggpredict(modelo_no_lineal_3))
 
-# Renombrando palenes
+# Renombrando paneles
 # Obtener predicciones respetando los splines
 pred_SSTA <- ggpredict(modelo_no_lineal_3, terms = "SSTA [all]")
 pred_sam  <- ggpredict(modelo_no_lineal_3, terms = "SAM [all]")
