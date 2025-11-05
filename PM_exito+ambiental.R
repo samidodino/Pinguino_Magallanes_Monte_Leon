@@ -10,7 +10,7 @@ library(ggplot2)
 data_PM <- read.csv("ER 2010-2024.csv")
 
 
-data_amb <- read_csv("data_ambiental_PM_monte_leon.csv")
+data_amb <- read.csv("data_ambiental_PM_monte_leon.csv")
 str(data_amb)
 
 data_full <- data_PM %>% 
