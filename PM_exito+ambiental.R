@@ -70,42 +70,54 @@ str(data_PM_full$pichon)
 # Modelo ordinal con efecto no lineal 
 # 1) Analisis de correlaciones entre variables ambientales
 
-cor.test(data_full$SST,data_full$SSTA)#r=0.9
+cor.test(data_full$SST,data_full$SSTA)#r=0.9, correlacionadas
 cor.test(data_full$SST,data_full$Chla)# r=0.5
-cor.test(data_full$SSTA,data_full$Chla)#0.7
+cor.test(data_full$SSTA,data_full$Chla)#0.7, correlacionadas
 cor.test(data_full$SAM, data_full$SST)# 0.34
 cor.test(data_full$SAM, data_full$SSTA)#0.27
 cor.test(data_full$SAM, data_full$Chla)#0.15
 
 #2) Modelo
-# con SST + Chla + SAM
-modelo_no_lineal <- clm(pichon ~ ns(SST, df = 2)+ns(Chla, df = 3)+ns(SAM, df = 2), 
+# Con SST + Chla + SAM (excluimos SSTA por colinealidad con SST y Chla)
+modelo_no_lineal <- clm(pichon ~ ns(SST, df = 2)+ns(Chla, df = 2)+ns(SAM, df = 2), 
                         data = data_PM_full,na.action = na.fail)
 summary(modelo_no_lineal) #SST no significativa!--> decidimos sacarla del modelo
+
 dredge(modelo_no_lineal)
 tab_model(modelo_no_lineal)
 
 
-
-modelo_no_lineal_2 <- clm(pichon ~ ns(Chla, df = 3)+ns(SAM, df = 2), 
-                        data = data_PM_full,na.action = na.fail)
+#Sacando SST
+modelo_no_lineal_2 <- clm(pichon ~ ns(Chla, df = 2)+ns(SAM, df = 2), 
+                          data = data_PM_full,na.action = na.fail)
 
 
 summary(modelo_no_lineal_2) 
 dredge(modelo_no_lineal_2)
 tab_model(modelo_no_lineal_2)
 
+#Con SSTA (excluyendo SST y Chla por colinealidad) + SAM
+modelo_no_lineal_3 <- clm(pichon ~ ns(SSTA, df = 1)+ns(SAM, df = 2), 
+                          data = data_PM_full,na.action = na.fail)
+
+
+summary(modelo_no_lineal_3) 
+dredge(modelo_no_lineal_3)
+tab_model(modelo_no_lineal_3)
+
+
+
 
 # GRAFICAR Predicciones
-plot(ggpredict(modelo_no_lineal_2))
+plot(ggpredict(modelo_no_lineal_3))
 
 # Renombrando palenes
 # Obtener predicciones respetando los splines
-pred_chla <- ggpredict(modelo_no_lineal_2, terms = "Chla [all]")
-pred_sam  <- ggpredict(modelo_no_lineal_2, terms = "SAM [all]")
+pred_SSTA <- ggpredict(modelo_no_lineal_3, terms = "SSTA [all]")
+pred_sam  <- ggpredict(modelo_no_lineal_3, terms = "SAM [all]")
 
 # Modificar los niveles del factor que controla las facetas/categorias
-pred_chla$response.level <- factor(pred_chla$response.level,
+pred_SSTA$response.level <- factor(pred_SSTA$response.level,
                                    levels = c("1", "2", "3"),
                                    labels = c("0 pichón", "1 pichón", "2 pichones"))
 pred_sam$response.level  <- factor(pred_sam$response.level,
@@ -113,10 +125,5 @@ pred_sam$response.level  <- factor(pred_sam$response.level,
                                    labels = c("0 pichón", "1 pichón", "2 pichones"))
 
 # Graficar 
-plot(pred_chla) + ggtitle("Efecto de la clorofila-a (Chla)")
+plot(pred_SSTA) + ggtitle("Efecto de las Anomalias de Temperatura (SSTA)")
 plot(pred_sam)  + ggtitle("Efecto del índice SAM ")
-
-
-
-
-
