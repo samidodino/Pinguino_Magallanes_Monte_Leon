@@ -1,9 +1,9 @@
-############ Environmental data - Monte Leon ##################
+############ Variables ambientales - Monte Leon ##################
 ### Agrupar rasters Chla, SST y SSTA por temporadas
-### Extraer buffer al rededor de la colonia de Monte Leon
-### Maxima distancia de alimentacion de Magallanicos adultos en cuidado temprano de pichones:
-### De Rosciano et al. 2016: 21 a 35km
-### Raya Rey et al. 2010: 14 to 45 km
+# Extraer buffer alrededor de la colonia de Monte Leon
+# Maxima distancia de alimentacion de Magallanicos adultos en cuidado temprano de pichones:
+# De Rosciano et al. 2016: 21 a 35km
+# Raya Rey et al. 2010: 14 to 45 km
 
 ################### Chla, SST, SSTA ################################
 # Datos de Chla y SST fueron bajados de MODIS, de la pagina Oceandata: https://oceandata.sci.gsfc.nasa.gov/api/file_search
